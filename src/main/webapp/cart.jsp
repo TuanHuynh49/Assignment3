@@ -26,6 +26,7 @@
             <tr>
                 <td>
                     <form action="cart" method="post">
+                        <input type="hidden" name="action" value="update">
                         <input type="hidden" name="productCode" value="<%= item.getProduct().getCode() %>">
                         <input type="text" name="quantity" value="<%= item.getQuantity() %>" size="2">
                         <input type="submit" value="Update">
@@ -36,8 +37,8 @@
                 <td class="right"><%= item.getTotalCurrencyFormat() %></td>
                 <td>
                     <form action="cart" method="post">
+                        <input type="hidden" name="action" value="remove">
                         <input type="hidden" name="productCode" value="<%= item.getProduct().getCode() %>">
-                        <input type="hidden" name="quantity" value="0">
                         <input type="submit" value="Remove Item">
                     </form>
                 </td>

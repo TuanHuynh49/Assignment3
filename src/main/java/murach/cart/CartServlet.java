@@ -39,28 +39,32 @@ public class CartServlet extends HttpServlet {
             action = "cart";  // default action
         }
 
+        // Get Cart from session
+        Cart cart = (Cart) session.getAttribute("cart");
+        if (cart == null) {
+            cart = new Cart();
+        }
+
         // Perform action and set URL to appropriate page
         String url = "/index.html";
         if (action.equals("shop")) {
             url = "/index.html";
         } 
         else if (action.equals("cart")) {
+            // Add product to cart (or increase quantity by quantity added)
             String productCode = request.getParameter("productCode");
             String quantityString = request.getParameter("quantity");
 
-            Cart cart = (Cart) session.getAttribute("cart");
-            if (cart == null) {
-                cart = new Cart();
-            }
-
-            int quantity;
-            try {
-                quantity = Integer.parseInt(quantityString);
-                if (quantity < 0) {
+            int quantity = 1;
+            if (quantityString != null) {
+                try {
+                    quantity = Integer.parseInt(quantityString);
+                    if (quantity < 1) {
+                        quantity = 1;
+                    }
+                } catch (NumberFormatException nfe) {
                     quantity = 1;
                 }
-            } catch (NumberFormatException nfe) {
-                quantity = 1;
             }
 
             String path = sc.getRealPath("/WEB-INF/products.txt");
@@ -70,14 +74,32 @@ public class CartServlet extends HttpServlet {
                 LineItem lineItem = new LineItem();
                 lineItem.setProduct(product);
                 lineItem.setQuantity(quantity);
-                if (quantity > 0) {
-                    cart.addItem(lineItem);
-                } else if (quantity <= 0) {
-                    cart.removeItem(lineItem);
-                }
+                cart.addItem(lineItem);
             }
 
-            // Store cart in session
+            session.setAttribute("cart", cart);
+            url = "/cart.jsp";
+        }
+        else if (action.equals("update")) {
+            // Update exact quantity from cart.jsp
+            String productCode = request.getParameter("productCode");
+            String quantityString = request.getParameter("quantity");
+
+            int quantity = 1;
+            try {
+                quantity = Integer.parseInt(quantityString);
+            } catch (NumberFormatException nfe) {
+                quantity = 1;
+            }
+
+            cart.updateItem(productCode, quantity);
+            session.setAttribute("cart", cart);
+            url = "/cart.jsp";
+        }
+        else if (action.equals("remove") || action.equals("removeItem")) {
+            // Remove item from cart
+            String productCode = request.getParameter("productCode");
+            cart.removeItemByCode(productCode);
             session.setAttribute("cart", cart);
             url = "/cart.jsp";
         }
