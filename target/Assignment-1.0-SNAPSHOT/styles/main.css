@@ -1,0 +1,71 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11pt;
+    margin: 2em;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+h1 {
+    color: teal;
+    font-size: 14pt;
+    margin-bottom: 0.8em;
+}
+
+table {
+    border-collapse: collapse;
+    border: 1px solid black;
+    margin-bottom: 1.2em;
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 0.4em 0.8em;
+    vertical-align: middle;
+}
+
+th {
+    text-align: left;
+    font-weight: bold;
+}
+
+.right {
+    text-align: right;
+}
+
+.center {
+    text-align: center;
+}
+
+form {
+    margin: 0;
+    padding: 0;
+    display: inline;
+}
+
+input[type="text"] {
+    width: 2.5em;
+    text-align: right;
+    padding: 2px 4px;
+    margin-right: 4px;
+}
+
+input[type="submit"], button {
+    padding: 2px 8px;
+    font-size: 10pt;
+    cursor: pointer;
+}
+
+.btn-group {
+    margin-top: 1em;
+}
+
+.btn-group form {
+    margin-right: 0.5em;
+    display: block;
+    margin-bottom: 0.5em;
+}
+
+p {
+    margin: 0.8em 0;
+}
