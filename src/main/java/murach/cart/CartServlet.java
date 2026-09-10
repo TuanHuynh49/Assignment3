@@ -4,7 +4,6 @@ import java.io.IOException;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,7 +13,6 @@ import murach.business.Cart;
 import murach.business.LineItem;
 import murach.business.Product;
 import murach.data.ProductIO;
-import murach.util.CookieUtil;
 
 @WebServlet(name = "CartServlet", urlPatterns = {"/cart"})
 public class CartServlet extends HttpServlet {
@@ -24,34 +22,29 @@ public class CartServlet extends HttpServlet {
             throws ServletException, IOException {
         
         ServletContext sc = getServletContext();
-        HttpSession session = request.getSession();
         
-        // Check for existing userEmail cookie and sync with session
-        Cookie[] cookies = request.getCookies();
-        String userEmailCookie = CookieUtil.getCookieValue(cookies, "userEmail");
-        if (!userEmailCookie.isEmpty() && session.getAttribute("userEmail") == null) {
-            session.setAttribute("userEmail", userEmailCookie);
-        }
+        // 1. Khởi tạo / lấy Session
+        HttpSession session = request.getSession();
 
-        // Get current action
-        String action = request.getParameter("action");
-        if (action == null) {
-            action = "cart";  // default action
-        }
-
-        // Get Cart from session
+        // 2. Lấy đối tượng Cart từ Session (nếu chưa có thì tạo mới)
         Cart cart = (Cart) session.getAttribute("cart");
         if (cart == null) {
             cart = new Cart();
         }
 
-        // Perform action and set URL to appropriate page
+        // 3. Lấy action từ request
+        String action = request.getParameter("action");
+        if (action == null) {
+            action = "cart";  // default action
+        }
+
+        // 4. Xử lý các action nghiệp vụ
         String url = "/index.html";
         if (action.equals("shop")) {
             url = "/index.html";
         } 
         else if (action.equals("cart")) {
-            // Add product to cart (or increase quantity by quantity added)
+            // Thêm sản phẩm vào giỏ hàng
             String productCode = request.getParameter("productCode");
             String quantityString = request.getParameter("quantity");
 
@@ -77,11 +70,12 @@ public class CartServlet extends HttpServlet {
                 cart.addItem(lineItem);
             }
 
+            // Lưu giỏ hàng vào Session
             session.setAttribute("cart", cart);
             url = "/cart.jsp";
         }
         else if (action.equals("update")) {
-            // Update exact quantity from cart.jsp
+            // Cập nhật lại số lượng trong giỏ hàng
             String productCode = request.getParameter("productCode");
             String quantityString = request.getParameter("quantity");
 
@@ -93,41 +87,25 @@ public class CartServlet extends HttpServlet {
             }
 
             cart.updateItem(productCode, quantity);
+            
+            // Cập nhật lại Session
             session.setAttribute("cart", cart);
             url = "/cart.jsp";
         }
         else if (action.equals("remove") || action.equals("removeItem")) {
-            // Remove item from cart
+            // Xóa sản phẩm khỏi giỏ hàng
             String productCode = request.getParameter("productCode");
             cart.removeItemByCode(productCode);
+            
+            // Cập nhật lại Session
             session.setAttribute("cart", cart);
             url = "/cart.jsp";
         }
         else if (action.equals("checkout")) {
             url = "/checkout.jsp";
         }
-        else if (action.equals("saveUser")) {
-            // Save user info into Cookie and Session
-            String email = request.getParameter("email");
-            if (email != null && !email.trim().isEmpty()) {
-                Cookie c = new Cookie("userEmail", email.trim());
-                c.setMaxAge(60 * 60 * 24 * 365 * 2); // 2 years
-                c.setPath("/");
-                response.addCookie(c);
-                session.setAttribute("userEmail", email.trim());
-            }
-            url = "/checkout.jsp";
-        }
-        else if (action.equals("deleteCookie")) {
-            // Delete cookie
-            Cookie c = new Cookie("userEmail", "");
-            c.setMaxAge(0);
-            c.setPath("/");
-            response.addCookie(c);
-            session.removeAttribute("userEmail");
-            url = "/checkout.jsp";
-        }
 
+        // 5. Chuyển hướng đến trang tương ứng
         sc.getRequestDispatcher(url).forward(request, response);
     }
     

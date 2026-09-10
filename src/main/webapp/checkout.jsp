@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="murach.business.Cart, murach.business.LineItem, murach.util.CookieUtil" %>
+<%@ page import="murach.business.Cart, murach.business.LineItem" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -15,42 +15,10 @@
                     <div class="header-icon">💳</div>
                     <div>
                         <h1>Checkout Summary</h1>
-                        <div class="subtitle">Review your order details and session info</div>
+                        <div class="subtitle">Review your order details stored in Session</div>
                     </div>
                 </div>
             </div>
-            
-            <%
-                String userEmail = (String) session.getAttribute("userEmail");
-                if (userEmail == null || userEmail.isEmpty()) {
-                    userEmail = CookieUtil.getCookieValue(request.getCookies(), "userEmail");
-                }
-            %>
-            
-            <% if (userEmail != null && !userEmail.isEmpty()) { %>
-                <div class="cookie-card">
-                    <div class="cookie-badge">
-                        <span>👋</span>
-                        <span>Welcome back, <b><%= userEmail %></b> <i style="font-weight: normal; color: var(--slate-600);">(Loaded from Cookie)</i></span>
-                    </div>
-                    <form action="cart" method="post">
-                        <input type="hidden" name="action" value="deleteCookie">
-                        <button type="submit" class="btn btn-remove">Forget Me (Delete Cookie)</button>
-                    </form>
-                </div>
-            <% } else { %>
-                <div class="cookie-card" style="flex-direction: column; align-items: flex-start; gap: 12px;">
-                    <div class="cookie-badge" style="color: var(--slate-800);">
-                        <span>🍪</span>
-                        <span><b>Save your session:</b> Enter email to remember your device using Persistent Cookie</span>
-                    </div>
-                    <form action="cart" method="post" style="width: 100%; gap: 10px;">
-                        <input type="hidden" name="action" value="saveUser">
-                        <input type="email" name="email" placeholder="Enter your email (e.g. user@example.com)" style="flex: 1; min-width: 260px;" required>
-                        <button type="submit" class="btn btn-primary">Save Email</button>
-                    </form>
-                </div>
-            <% } %>
             
             <div class="table-wrapper">
                 <table>
