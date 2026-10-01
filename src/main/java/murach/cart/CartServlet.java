@@ -152,14 +152,27 @@ public class CartServlet extends HttpServlet {
                 vnp_Params.put("vnp_Locale", "vn");
             }
 
-            // Xây dựng dynamic Return URL từ request context
-            String returnUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-                    + request.getContextPath() + "/cart?action=vnpay_return";
+            // Xây dựng dynamic Return URL hỗ trợ cả Localhost và Reverse Proxy trên Render/Cloud
+            String scheme = request.getHeader("X-Forwarded-Proto");
+            if (scheme == null || scheme.isEmpty()) {
+                scheme = request.getScheme();
+            }
+            String host = request.getHeader("X-Forwarded-Host");
+            if (host == null || host.isEmpty()) {
+                host = request.getServerName();
+                int port = request.getServerPort();
+                if (("http".equalsIgnoreCase(scheme) && port != 80) || ("https".equalsIgnoreCase(scheme) && port != 443)) {
+                    host += ":" + port;
+                }
+            }
+            String returnUrl = scheme + "://" + host + request.getContextPath() + "/cart?action=vnpay_return";
             vnp_Params.put("vnp_ReturnUrl", returnUrl);
             vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
-            Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+            // Định dạng thời gian CHÍNH XÁC theo múi giờ Việt Nam (Asia/Ho_Chi_Minh GMT+7)
+            Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+            formatter.setTimeZone(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
             String vnp_CreateDate = formatter.format(cld.getTime());
             vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
