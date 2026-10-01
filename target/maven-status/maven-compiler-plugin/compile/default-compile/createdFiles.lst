@@ -1,3 +1,4 @@
+murach\cart\VNPayConfig.class
 murach\business\Cart.class
 murach\cart\CartServlet.class
 murach\business\LineItem.class

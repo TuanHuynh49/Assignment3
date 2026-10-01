@@ -74,4 +74,20 @@ public class Cart implements Serializable {
             }
         }
     }
+
+    public double getTotalAmount() {
+        double total = 0.0;
+        if (items != null) {
+            for (LineItem item : items) {
+                total += item.getTotal();
+            }
+        }
+        return total;
+    }
+
+    public void clear() {
+        if (items != null) {
+            items.clear();
+        }
+    }
 }
