@@ -152,16 +152,21 @@ public class CartServlet extends HttpServlet {
                 vnp_Params.put("vnp_Locale", "vn");
             }
 
-            // Xây dựng dynamic Return URL hỗ trợ cả Localhost và Reverse Proxy trên Render/Cloud
+            // Xây dựng dynamic Return URL chuẩn xác cho cả Localhost và Render Cloud
             String scheme = request.getHeader("X-Forwarded-Proto");
             if (scheme == null || scheme.isEmpty()) {
                 scheme = request.getScheme();
             }
             String host = request.getHeader("X-Forwarded-Host");
             if (host == null || host.isEmpty()) {
+                host = request.getHeader("Host");
+            }
+            if (host == null || host.isEmpty()) {
                 host = request.getServerName();
                 int port = request.getServerPort();
-                if (("http".equalsIgnoreCase(scheme) && port != 80) || ("https".equalsIgnoreCase(scheme) && port != 443)) {
+                // Chỉ thêm port khi chạy ở máy local (localhost/127.0.0.1)
+                if ((host.equalsIgnoreCase("localhost") || host.equalsIgnoreCase("127.0.0.1"))
+                        && port != 80 && port != 443) {
                     host += ":" + port;
                 }
             }
